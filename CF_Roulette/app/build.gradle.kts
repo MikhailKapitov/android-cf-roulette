@@ -37,6 +37,17 @@ android {
 
 dependencies {
 
+    // Network stuff.
+    implementation(libs.retrofit)
+    implementation(libs.converter.moshi)
+    implementation(libs.logging.interceptor)
+
+    // Coroutines (Mostly for network stuff).
+    implementation(libs.kotlinx.coroutines.android)
+
+    // JSON stuff.
+    implementation(libs.moshi)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
