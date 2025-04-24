@@ -49,6 +49,9 @@ dependencies {
     implementation(libs.moshi)
     implementation(libs.moshi.kotlin)
 
+    // Storing data and hashing.
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.commons.text)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

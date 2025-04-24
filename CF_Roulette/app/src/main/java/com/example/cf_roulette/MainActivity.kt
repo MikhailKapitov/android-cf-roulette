@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import com.example.cf_roulette.data.Problem
 import com.example.cf_roulette.repository.ProblemRepository
 import kotlinx.coroutines.launch
 
@@ -21,21 +22,67 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
+        val problemRepository = ProblemRepository.getInstance(applicationContext)
+
+
+        // IK that this is terrible code. Just testing things.
         lifecycleScope.launch {
-            Log.d("CF", "Requesting...")
-            val problem = ProblemRepository.getProblem(800, 1200)
-            problem?.let {
-                if(problem.name != null){
-                    Log.d("CF", problem.name)
+
+            Log.d("TrashTest", "Clearing cache...")
+            Log.d("TrashTest", "Cache cleared: " + problemRepository.deleteCache().toString())
+
+            Log.d("TrashTest", "Generating [800; 1200]...")
+            var problem : Problem? = problemRepository.getProblem(800, 1200)
+            if (problem != null) {
+                val problemName = problem.name
+                if (problemName != null) {
+                    Log.d("TrashTest", problemName)
+                } else {
+                    Log.d("TrashTest", "Problem found, no name though.")
                 }
-                else{
-                    Log.d("CF", "Problem found, no name though.")
+            } else {
+                Log.d("TrashTest", "No problem found (That is not a good thing LOL).")
+            }
+
+            Log.d("TrashTest", "Updating cache...")
+            Log.d("TrashTest", "Cache update:" + problemRepository.updateCache().toString())
+
+            problem = problemRepository.getProblem(800, 1200, 123)
+            if (problem != null) {
+                val problemName = problem.name
+                if (problemName != null) {
+                    Log.d("TrashTest", problemName)
+                } else {
+                    Log.d("TrashTest", "Problem found, no name though.")
                 }
-                // Nice!
-            } ?: run {
-                Log.d("CF", "No problem found (That is not a good thing LOL).")
-                // Null...
+            } else {
+                Log.d("TrashTest", "No problem found (That is not a good thing LOL).")
+            }
+
+            problem = problemRepository.getProblem(800, 1200, 123)
+            if (problem != null) {
+                val problemName = problem.name
+                if (problemName != null) {
+                    Log.d("TrashTest", problemName)
+                } else {
+                    Log.d("TrashTest", "Problem found, no name though.")
+                }
+            } else {
+                Log.d("TrashTest", "No problem found (That is not a good thing LOL).")
+            }
+
+            problem = problemRepository.getProblem(800, 1200)
+            if (problem != null) {
+                val problemName = problem.name
+                if (problemName != null) {
+                    Log.d("TrashTest", problemName)
+                } else {
+                    Log.d("TrashTest", "Problem found, no name though.")
+                }
+            } else {
+                Log.d("TrashTest", "No problem found (That is not a good thing LOL).")
             }
         }
+
     }
 }
