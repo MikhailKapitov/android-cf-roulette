@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.example.cf_roulette.data.Problem
 import com.example.cf_roulette.data.ProblemsetResponse
+import com.example.cf_roulette.data.ProblemsetResult
 import com.example.cf_roulette.network.NetworkModule
 import com.example.cf_roulette.storage.FileManager
 import kotlinx.coroutines.Dispatchers
@@ -40,7 +41,7 @@ class ProblemRepository private constructor(context: Context) {
         try {
             val response = apiService.getProblemset()
             if (response.isSuccessful && response.body()?.status == "OK") {
-                response.body()?.let {
+                response.body()?.result?.let {
                     fileManager.saveProblemset(it)
                     return@withContext true
                 }
@@ -56,8 +57,8 @@ class ProblemRepository private constructor(context: Context) {
         fileManager.deleteProblemset()
     }
 
-    private fun processProblemset(response: ProblemsetResponse?, lowerBound: Int, upperBound: Int, seed: Long?): Problem? {
-        val problems = response?.result?.problems ?: return null
+    private fun processProblemset(response: ProblemsetResult?, lowerBound: Int, upperBound: Int, seed: Long?): Problem? {
+        val problems = response?.problems ?: return null
         val filteredProblems = problems.filter { problem ->
             when {
                 lowerBound == 800 && upperBound == 3500 -> true
