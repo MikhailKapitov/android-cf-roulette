@@ -1,11 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <TextView
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:gravity="center"
-        android:text="task_gen" />
-</FrameLayout>
+        android:layout_marginTop="16dp">
+
+        <EditText
+            android:id="@+id/minDifficulty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:hint="Min"
+            android:inputType="number"
+            android:minWidth="80dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="--------"
+            android:textSize="20sp" />
+
+        <EditText
+            android:id="@+id/maxDifficulty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="Max"
+            android:inputType="number"
+            android:minWidth="80dp"/>
+    </LinearLayout>
+
+    <!-- TAGS -->
+    <TextView
+        android:id="@+id/tagsTitle"
+        android:layout_width="372dp"
+        android:layout_height="74dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="24dp"
+        android:text="TAGS"
+        android:textSize="20sp" />
+
+    <!-- Селектор тэгов -->
+    <Spinner
+        android:id="@+id/tagSelector"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"/>
+
+    <!-- Кнопка AND/OR -->
+    <Button
+        android:id="@+id/andOrButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="AND/OR"
+        android:layout_gravity="center"
+        android:layout_marginTop="12dp"/>
+
+    <!-- Кнопка Roulette -->
+    <Button
+        android:id="@+id/rouletteButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Roulette"
+        android:layout_gravity="center"
+        android:layout_marginTop="12dp"/>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_marginTop="16dp"
+        android:background="#EEEEEE">
+
+        <TextView
+            android:id="@+id/taskView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="Task "
+            android:textSize="16sp"
+            android:padding="8dp"/>
+
+        <Button
+            android:id="@+id/statusButton"
+            android:layout_width="70dp"
+            android:text="status"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:background="#2196F3"/>
+    </RelativeLayout>
+
+</LinearLayout>
