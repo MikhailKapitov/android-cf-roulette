@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">CF_Roulette</string>
+    <string name="nav_welcome">Welcome</string>
+    <string name="nav_registration">Registration</string>
+    <string name="nav_generator">Generator</string>
+    <string name="nav_db">DB</string>
+    <string name="nav_daily">Daily</string>
 </resources>
