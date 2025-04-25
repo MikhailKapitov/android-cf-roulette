@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingTop="32dp"
+    android:paddingHorizontal="16dp"
+    android:gravity="top|center_horizontal">
+
+    <Button
+        android:id="@+id/copy_link_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="🔗 Developer Blog"
+        android:layout_gravity="end" />
+
+    <ImageView
+        android:id="@+id/welcome_gif"
+        android:layout_width="328dp"
+        android:layout_height="355dp"
+        android:layout_marginTop="50dp"
+        android:scaleType="centerCrop" />
+
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:text="welcome" />
-</FrameLayout>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="70dp"
+        android:text="Welcome to CF Roulette"
+        android:textAlignment="center"
+        android:textSize="30sp" />
+</LinearLayout>
