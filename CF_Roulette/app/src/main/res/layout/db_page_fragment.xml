@@ -1,11 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:text="DB" />
-</FrameLayout>
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="24dp">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center">
+
+        <TextView
+            android:id="@+id/db_hash_1"
+            android:layout_width="150dp"
+            android:layout_height="100dp"
+            android:gravity="center"
+            android:text="DB hash"
+            android:textSize="18sp"
+            android:background="@android:color/darker_gray"
+            android:textColor="@android:color/white"
+            android:padding="8dp"
+            android:layout_marginEnd="16dp" />
+
+        <TextView
+            android:id="@+id/db_hash_2"
+            android:layout_width="150dp"
+            android:layout_height="100dp"
+            android:gravity="center"
+            android:text="DB hash"
+            android:textSize="18sp"
+            android:background="@android:color/darker_gray"
+            android:textColor="@android:color/white"
+            android:padding="8dp" />
+    </LinearLayout>
+
+    <!-- Кнопки под полями -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="24dp"
+        android:layout_gravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Last_Update"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:padding="8dp"
+            android:layout_marginEnd="16dp" />
+
+        <Button
+            android:id="@+id/btn_last_update"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Btn_last_updt"
+            android:padding="8dp" />
+    </LinearLayout>
+
+</LinearLayout>
