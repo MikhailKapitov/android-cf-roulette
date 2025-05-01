@@ -22,22 +22,12 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
-    lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
-        sharedPreferences = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
-
-
-        if (sharedPreferences.getString("cf_nickname", null).isNullOrEmpty()) {
-            supportFragmentManager.commit {
-                replace(R.id.fragment_container, RegistrationPageFragment())
-            }
-        }
-
         setContentView(R.layout.activity_main)
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
