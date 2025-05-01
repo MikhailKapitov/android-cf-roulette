@@ -33,3 +33,11 @@ data class Contest(
     @Json(name = "startTimeSeconds") val startTimeSeconds: Int
     // Also "name", "phase", "frozen", "relativeTimeSeconds".
 )
+
+// temp realization
+data class Task(
+    val id: Int,
+    val name: String,
+    val status: Int,
+    val link: String?
+)
