@@ -9,15 +9,18 @@ import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cf_roulette.R
-import com.example.cf_roulette.data.Task
-import java.util.*
+import com.example.cf_roulette.data.Problem
+import com.example.cf_roulette.repository.ProblemRepository
+import kotlinx.coroutines.launch
+import java.util.Calendar
+import java.util.TimeZone
 import java.util.concurrent.TimeUnit
 
 class DailyTasksPageFragment : Fragment() {
@@ -26,7 +29,7 @@ class DailyTasksPageFragment : Fragment() {
     private lateinit var timerTextView: TextView
     private lateinit var recyclerView: RecyclerView
     private lateinit var taskAdapter: TaskAdapter
-    private lateinit var btnUpdateStatus: Button
+    private lateinit var problemRepository: ProblemRepository
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,28 +38,50 @@ class DailyTasksPageFragment : Fragment() {
         val view = inflater.inflate(R.layout.daily_tasks_page_fragment, container, false)
         timerTextView = view.findViewById(R.id.timer_text)
         recyclerView = view.findViewById(R.id.item_list)
-        btnUpdateStatus = view.findViewById(R.id.btn_update_status)
 
-        setupRecyclerView()
+        problemRepository = ProblemRepository.getInstance(requireContext())
+
+        setupRecyclerView(emptyList())
+
         startUtcCountdown()
 
-        // update task every day
+        loadDailyTasks()
+
         startDailyTaskUpdate()
 
-        // check task status  every 10 minutes
         startStatusUpdate()
-        // btn for update status
-        btnUpdateStatus.setOnClickListener {
-            startStatusUpdate()
-        }
 
         return view
     }
-    // just declare functions
+
+    private fun setupRecyclerView(problems: List<Problem>) {
+        taskAdapter = TaskAdapter(problems) { problem ->
+            val url = "https://codeforces.com/problemset/problem/${problem.contestId}/${problem.index}"
+            copyToClipboard(url)
+            Toast.makeText(requireContext(), "Ссылка скопирована!", Toast.LENGTH_SHORT).show()
+        }
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        recyclerView.adapter = taskAdapter
+    }
+
+    private fun loadDailyTasks() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val problems = problemRepository.getDailyProblems()
+                val validProblems = problems.filterNotNull()
+                taskAdapter.updateProblems(validProblems)
+                if (validProblems.isEmpty()) {
+                    Toast.makeText(requireContext(), "Не удалось загрузить задачи", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "Ошибка загрузки задач: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
     private fun startDailyTaskUpdate() {
-        val dailyUpdateTimer = object : CountDownTimer(24 * 60 * 60 * 1000, 24 * 60 * 60 * 1000) { // 24 часа
+        val dailyUpdateTimer = object : CountDownTimer(24 * 60 * 60 * 1000, 24 * 60 * 60 * 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                updateTasks()
             }
 
             override fun onFinish() {
@@ -66,17 +91,14 @@ class DailyTasksPageFragment : Fragment() {
         }.start()
     }
 
-
     private fun updateTasks() {
+        loadDailyTasks()
         Toast.makeText(requireContext(), "Задачи обновлены!", Toast.LENGTH_SHORT).show()
     }
 
-
-    // just declare functions
     private fun startStatusUpdate() {
-        val statusUpdateTimer = object : CountDownTimer(10 * 60 * 1000, 10 * 60 * 1000) { // Каждые 10 минут
+        val statusUpdateTimer = object : CountDownTimer(60 * 1000, 60 * 1000) { // Каждые 60 секунд
             override fun onTick(millisUntilFinished: Long) {
-                checkTasksStatus()
             }
 
             override fun onFinish() {
@@ -86,31 +108,9 @@ class DailyTasksPageFragment : Fragment() {
         }.start()
     }
 
-    // just declare functions
     private fun checkTasksStatus() {
-        //here need realize code for check
+        // TODO: Реализовать проверку статуса задач (например, через UserStatusResponse)
         Toast.makeText(requireContext(), "Статусы задач обновлены!", Toast.LENGTH_SHORT).show()
-    }
-
-
-
-    private fun setupRecyclerView() {
-        val defaultTasks = listOf(
-            Task(1, "Two Sum", 0, "https://codeforces.com/problemset/problem/1/A"),
-            Task(2, "Binary Search", 1, "https://codeforces.com/problemset/problem/2/B"),
-            Task(3, "Graph Paths", 2, "https://codeforces.com/problemset/problem/3/C"),
-            Task(4, "Suffix Array", 3, "https://codeforces.com/problemset/problem/4/D")
-        )
-
-        taskAdapter = TaskAdapter(defaultTasks) { task ->
-            task.link?.let {
-                copyToClipboard(it)
-                Toast.makeText(requireContext(), "Ссылка скопирована!", Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = taskAdapter
     }
 
     private fun copyToClipboard(text: String) {
@@ -154,13 +154,13 @@ class DailyTasksPageFragment : Fragment() {
 }
 
 
-
 class TaskAdapter(
-    private val tasks: List<Task>,
-    private val onItemClick: (Task) -> Unit
+    private var problems: List<Problem> = emptyList(),
+    private val onItemClick: (Problem) -> Unit
 ) : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
 
     class TaskViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val taskId: TextView = view.findViewById(R.id.task_id)
         val taskTitle: TextView = view.findViewById(R.id.task_name)
         val taskStatus: TextView = view.findViewById(R.id.task_status)
     }
@@ -172,28 +172,20 @@ class TaskAdapter(
     }
 
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
-        val task = tasks[position]
-        holder.taskTitle.text = task.name
-        holder.taskStatus.text = when (task.status) {
-            0 -> "Didn't try"
-            1 -> "Solve"
-            2 -> "Didn't Solve"
-            3 -> "Don't know yet"
-            else -> "Unknown"
-        }
+        val problem = problems[position]
 
-        holder.taskStatus.setTextColor(
-            when (task.status) {
-                1 -> Color.parseColor("#4CAF50") // Зеленый — решил
-                2 -> Color.parseColor("#F44336") // Красный — не решил
-                0 -> Color.parseColor("#9E9E9E") // Серый — не пытался
-                3 -> Color.parseColor("#FF9800") // Оранжевый — пока не знаем
-                else -> Color.BLACK
-            }
-        )
+        holder.taskId.text = "ID: ${problem.contestId ?: "N/A"}${problem.index ?: ""}"
+        holder.taskTitle.text = problem.name ?: "No title"
+        holder.taskStatus.text = "Status: Pending"
+        holder.taskStatus.setTextColor(Color.GRAY)
 
-        holder.itemView.setOnClickListener { onItemClick(task) }
+        holder.itemView.setOnClickListener { onItemClick(problem) }
     }
 
-    override fun getItemCount() = tasks.size
+    override fun getItemCount() = problems.size
+
+    fun updateProblems(newProblems: List<Problem>) {
+        problems = newProblems
+        notifyDataSetChanged()
+    }
 }
