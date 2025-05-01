@@ -1,16 +1,20 @@
 package com.example.cf_roulette
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.commit
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.cf_roulette.data.Contest
 import com.example.cf_roulette.data.Problem
+import com.example.cf_roulette.fragments.RegistrationPageFragment
 import com.example.cf_roulette.repository.ContestRepository
 import com.example.cf_roulette.repository.ProblemRepository
 import com.example.cf_roulette.repository.UserStatusRepository
@@ -18,9 +22,21 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
+    lateinit var sharedPreferences: SharedPreferences
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        sharedPreferences = getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+
+
+        if (sharedPreferences.getString("cf_nickname", null).isNullOrEmpty()) {
+            supportFragmentManager.commit {
+                replace(R.id.fragment_container, RegistrationPageFragment())
+            }
+        }
+
         setContentView(R.layout.activity_main)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
