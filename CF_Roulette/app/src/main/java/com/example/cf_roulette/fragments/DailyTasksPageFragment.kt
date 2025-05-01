@@ -9,6 +9,7 @@ import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -25,6 +26,7 @@ class DailyTasksPageFragment : Fragment() {
     private lateinit var timerTextView: TextView
     private lateinit var recyclerView: RecyclerView
     private lateinit var taskAdapter: TaskAdapter
+    private lateinit var btnUpdateStatus: Button
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,12 +35,64 @@ class DailyTasksPageFragment : Fragment() {
         val view = inflater.inflate(R.layout.daily_tasks_page_fragment, container, false)
         timerTextView = view.findViewById(R.id.timer_text)
         recyclerView = view.findViewById(R.id.item_list)
+        btnUpdateStatus = view.findViewById(R.id.btn_update_status)
 
         setupRecyclerView()
         startUtcCountdown()
 
+        // update task every day
+        startDailyTaskUpdate()
+
+        // check task status  every 10 minutes
+        startStatusUpdate()
+        // btn for update status
+        btnUpdateStatus.setOnClickListener {
+            updateTasks()
+        }
+
         return view
     }
+    // just declare functions
+    private fun startDailyTaskUpdate() {
+        val dailyUpdateTimer = object : CountDownTimer(24 * 60 * 60 * 1000, 24 * 60 * 60 * 1000) { // 24 часа
+            override fun onTick(millisUntilFinished: Long) {
+                updateTasks()
+            }
+
+            override fun onFinish() {
+                updateTasks()
+                startDailyTaskUpdate()
+            }
+        }.start()
+    }
+
+
+    private fun updateTasks() {
+        Toast.makeText(requireContext(), "Задачи обновлены!", Toast.LENGTH_SHORT).show()
+    }
+
+
+    // just declare functions
+    private fun startStatusUpdate() {
+        val statusUpdateTimer = object : CountDownTimer(10 * 60 * 1000, 10 * 60 * 1000) { // Каждые 10 минут
+            override fun onTick(millisUntilFinished: Long) {
+                checkTasksStatus()
+            }
+
+            override fun onFinish() {
+                checkTasksStatus()
+                startStatusUpdate()
+            }
+        }.start()
+    }
+
+    // just declare functions
+    private fun checkTasksStatus() {
+        //here need realize code for check
+        Toast.makeText(requireContext(), "Статусы задач обновлены!", Toast.LENGTH_SHORT).show()
+    }
+
+
 
     private fun setupRecyclerView() {
         val defaultTasks = listOf(
@@ -122,8 +176,8 @@ class TaskAdapter(
         holder.taskTitle.text = task.name
         holder.taskStatus.text = when (task.status) {
             0 -> "Didn't try"
-            1 -> "Decided"
-            2 -> "Didn't decide"
+            1 -> "Solve"
+            2 -> "Didn't Solve"
             3 -> "Don't know yet"
             else -> "Unknown"
         }

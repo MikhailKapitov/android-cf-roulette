@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Таймер в правом верхнем углу -->
     <TextView
         android:id="@+id/timer_text"
         android:layout_width="wrap_content"
@@ -24,4 +23,13 @@
         android:layout_below="@id/timer_text"
         android:paddingTop="8dp"
         android:paddingBottom="8dp" />
+
+    <Button
+        android:id="@+id/btn_update_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="update task status"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="16dp" />
 </RelativeLayout>
