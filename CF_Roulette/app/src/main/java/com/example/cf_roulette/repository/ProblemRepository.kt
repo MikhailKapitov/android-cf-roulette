@@ -28,10 +28,10 @@ class ProblemRepository private constructor(private val context: Context) {
         }
     }
 
-    suspend fun getProblem(lowerBound: Int, upperBound: Int, randomSeed: Long? = null): Problem? {
+    suspend fun getProblem(lowerBound: Int, upperBound: Int, goodTags: List <String>, tagOring: Boolean, specialTagBanned: Boolean, randomSeed: Long? = null): Problem? {
         try {
             val cachedResponse = fileManager.loadProblemset()
-            return processProblemset(cachedResponse, lowerBound, upperBound, randomSeed)
+            return processProblemset(cachedResponse, lowerBound, upperBound, goodTags, tagOring, specialTagBanned, randomSeed)
         } catch (e: Exception) {
             Log.e("ProblemRepository", "Cache read error: ${e.message}")
             return null
@@ -58,7 +58,7 @@ class ProblemRepository private constructor(private val context: Context) {
         fileManager.deleteProblemset()
     }
 
-    private suspend fun processProblemset(response: ProblemsetResult?, lowerBound: Int, upperBound: Int, seed: Long?): Problem? {
+    private suspend fun processProblemset(response: ProblemsetResult?, lowerBound: Int, upperBound: Int, goodTags: List <String>, tagOring: Boolean, specialTagBanned: Boolean, seed: Long?): Problem? {
 
         val problems = response?.problems ?: return null
         val contestRepository = ContestRepository.getInstance(context)
@@ -94,11 +94,39 @@ class ProblemRepository private constructor(private val context: Context) {
             val diffMillis = nowCal.timeInMillis - contestCal.timeInMillis
             val daysSince = diffMillis / (1000 * 60 * 60 * 24)
 
-//            if (daysSince < 128){
-//                Log.d("ProblemFiltering", "Too young! " + problem.name + " " + contest.id + " " + daysSince.toString())
-//            }
+            if (daysSince < 128){
+                Log.d("ProblemFiltering", "Too young! " + problem.name + " " + contest.id + " " + daysSince.toString())
+                return@filter false
+            }
 
-            return@filter daysSince >= 128
+            val tags = problem.tags
+
+            if(tags == null){
+                if (specialTagBanned || goodTags.isNotEmpty()){
+                    return@filter false
+                }
+                return@filter true
+            }
+
+            if (specialTagBanned && "*special" in tags) {
+                return@filter false
+            }
+
+            if(tagOring){
+                for (tag in goodTags) {
+                    if (tag in tags){
+                        return@filter true
+                    }
+                }
+                return@filter false
+            }
+
+            for (tag in goodTags) {
+                if (tag !in tags){
+                    return@filter false
+                }
+            }
+            return@filter true
         }
 
         return getRandomProblem(filteredProblems, seed)

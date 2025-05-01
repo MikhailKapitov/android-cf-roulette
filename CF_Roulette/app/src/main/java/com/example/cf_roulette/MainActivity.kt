@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.cf_roulette.data.Contest
@@ -45,8 +44,8 @@ class MainActivity : AppCompatActivity() {
             Log.d("TrashTest", "Clearing cache...")
             Log.d("TrashTest", "Cache cleared: " + problemRepository.deleteCache().toString())
 
-            Log.d("TrashTest", "Generating [800; 1200]...")
-            var problem : Problem? = problemRepository.getProblem(800, 1200)
+            Log.d("TrashTest", "Generating problem...")
+            var problem : Problem? = problemRepository.getProblem(800, 1200, listOf("implementation", "brute force"), tagOring = false, specialTagBanned = true)
             if (problem != null) {
                 val problemName = problem.name
                 if (problemName != null) {
@@ -61,7 +60,8 @@ class MainActivity : AppCompatActivity() {
             Log.d("TrashTest", "Updating cache...")
             Log.d("TrashTest", "Cache update: " + problemRepository.updateCache().toString())
 
-            problem = problemRepository.getProblem(800, 1200, 123)
+            Log.d("TrashTest", "Generating problem...")
+            problem = problemRepository.getProblem(800, 1200, listOf("implementation", "brute force"), tagOring = false, specialTagBanned = true, 123)
             if (problem != null) {
                 val problemName = problem.name
                 if (problemName != null) {
@@ -73,7 +73,8 @@ class MainActivity : AppCompatActivity() {
                 Log.d("TrashTest", "No problem found (That is not a good thing LOL).")
             }
 
-            problem = problemRepository.getProblem(800, 1200, 123)
+            Log.d("TrashTest", "Generating problem...")
+            problem = problemRepository.getProblem(800, 1200, listOf("implementation", "brute force"), tagOring = false, specialTagBanned = true, 123)
             if (problem != null) {
                 val problemName = problem.name
                 if (problemName != null) {
@@ -85,7 +86,8 @@ class MainActivity : AppCompatActivity() {
                 Log.d("TrashTest", "No problem found (That is not a good thing LOL).")
             }
 
-            problem = problemRepository.getProblem(800, 1200)
+            Log.d("TrashTest", "Generating problem...")
+            problem = problemRepository.getProblem(800, 1200, listOf("implementation", "brute force"), tagOring = false, specialTagBanned = true)
             if (problem != null) {
                 val problemName = problem.name
                 if (problemName != null) {
@@ -97,7 +99,7 @@ class MainActivity : AppCompatActivity() {
                 Log.d("TrashTest", "No problem found (That is not a good thing LOL).")
             }
 
-            Thread.sleep(1000)
+
 
             Log.d("TrashTest", "Clearing contest cache...")
             Log.d("TrashTest", "Cache cleared: " + contestRepository.deleteCache().toString())
