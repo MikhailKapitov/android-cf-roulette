@@ -13,6 +13,7 @@ import com.example.cf_roulette.data.Contest
 import com.example.cf_roulette.data.Problem
 import com.example.cf_roulette.repository.ContestRepository
 import com.example.cf_roulette.repository.ProblemRepository
+import com.example.cf_roulette.repository.UserStatusRepository
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.launch
 
@@ -36,6 +37,7 @@ class MainActivity : AppCompatActivity() {
 
         val problemRepository = ProblemRepository.getInstance(applicationContext)
         val contestRepository = ContestRepository.getInstance(applicationContext)
+        val userStatusRepository = UserStatusRepository.getInstance(applicationContext)
 
 
         // IK that this is terrible code. Just testing things.
@@ -123,6 +125,8 @@ class MainActivity : AppCompatActivity() {
                 Log.d("TrashTest", "No contest found .")
             }
 
+
+
             Log.d("TrashTest", "Hashing!")
             var problemset = problemRepository.getProblemset(800, 3500, 0, listOf(), specialTagBanned = false, tagOring = false)
             if (problemset == null){
@@ -141,6 +145,8 @@ class MainActivity : AppCompatActivity() {
                 Log.d("TrashTest", "Hash filtered: " + problemRepository.hashProblemList(problemset))
                 Log.d("TrashTest", "Len: " + problemset.size)
             }
+
+
 
             Log.d("TrashTest", "Daily!")
             val daily = problemRepository.getDailyProblems()

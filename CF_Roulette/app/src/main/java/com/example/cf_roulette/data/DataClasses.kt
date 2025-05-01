@@ -35,6 +35,18 @@ data class Contest(
     // Also "phase", "frozen", "relativeTimeSeconds".
 )
 
+data class UserStatusResponse(
+    @Json(name = "status") val status: String,
+    @Json(name = "result") val result: List <Submission>
+)
+
+data class Submission(
+    @Json(name = "problem") val problem: Problem,
+    @Json(name = "creationTimeSeconds") val creationTimeSeconds: Int,
+    @Json(name = "verdict") val verdict: String
+    // Also "id", "contestId", "relativeTimeSeconds", "author", "programmingLanguage", "testset", "passedTestCount", "timeConsumedMillis", "memoryConsumedBytes", "points".
+)
+
 // temp realization
 data class Task(
     val id: Int,
