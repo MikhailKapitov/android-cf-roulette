@@ -28,10 +28,11 @@ data class ContestListResponse(
 
 data class Contest(
     @Json(name = "id") val id: Int,
+    @Json(name = "name") val name: String, // Only useful for testing.
     @Json(name = "type") val type: String,
     @Json(name = "durationSeconds") val durationSeconds: Int,
     @Json(name = "startTimeSeconds") val startTimeSeconds: Int
-    // Also "name", "phase", "frozen", "relativeTimeSeconds".
+    // Also "phase", "frozen", "relativeTimeSeconds".
 )
 
 // temp realization

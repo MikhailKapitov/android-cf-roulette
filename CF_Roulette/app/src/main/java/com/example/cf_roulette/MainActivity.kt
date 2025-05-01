@@ -10,7 +10,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import com.example.cf_roulette.data.Contest
 import com.example.cf_roulette.data.Problem
+import com.example.cf_roulette.repository.ContestRepository
 import com.example.cf_roulette.repository.ProblemRepository
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.launch
@@ -34,6 +36,7 @@ class MainActivity : AppCompatActivity() {
 
 
         val problemRepository = ProblemRepository.getInstance(applicationContext)
+        val contestRepository = ContestRepository.getInstance(applicationContext)
 
 
         // IK that this is terrible code. Just testing things.
@@ -56,7 +59,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             Log.d("TrashTest", "Updating cache...")
-            Log.d("TrashTest", "Cache update:" + problemRepository.updateCache().toString())
+            Log.d("TrashTest", "Cache update: " + problemRepository.updateCache().toString())
 
             problem = problemRepository.getProblem(800, 1200, 123)
             if (problem != null) {
@@ -93,6 +96,32 @@ class MainActivity : AppCompatActivity() {
             } else {
                 Log.d("TrashTest", "No problem found (That is not a good thing LOL).")
             }
+
+            Thread.sleep(1000)
+
+            Log.d("TrashTest", "Clearing contest cache...")
+            Log.d("TrashTest", "Cache cleared: " + contestRepository.deleteCache().toString())
+
+            Log.d("TrashTest", "Getting contest...")
+            var contest: Contest? = contestRepository.getContest(123)
+            if (contest != null) {
+                Log.d("TrashTest", "Found contest: " + contest.name)
+            } else {
+                Log.d("TrashTest", "No contest found.")
+            }
+
+            Log.d("TrashTest", "Updating contest cache...")
+            val updateSuccess =
+            Log.d("TrashTest", "Cache update: " + contestRepository.updateCache().toString())
+
+            Log.d("TrashTest", "Getting contest...")
+            contest = contestRepository.getContest(123)
+            if (contest != null) {
+                Log.d("TrashTest", "Found contest: " + contest.name)
+            } else {
+                Log.d("TrashTest", "No contest found .")
+            }
+
         }
 
     }
