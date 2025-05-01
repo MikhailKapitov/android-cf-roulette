@@ -47,7 +47,7 @@ class DailyTasksPageFragment : Fragment() {
         startStatusUpdate()
         // btn for update status
         btnUpdateStatus.setOnClickListener {
-            updateTasks()
+            startStatusUpdate()
         }
 
         return view
