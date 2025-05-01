@@ -34,6 +34,16 @@ class ContestRepository private constructor(context: Context) {
         }
     }
 
+    suspend fun getContestList(): List <Contest>? {
+        try {
+            val cachedResponse = fileManager.loadContestList()
+            return cachedResponse
+        } catch (e: Exception) {
+            Log.e("ContestRepository", "Cache read error: ${e.message}")
+            return null
+        }
+    }
+
     suspend fun updateCache(): Boolean = withContext(Dispatchers.IO) {
         try {
             val response = apiService.getContestList()
@@ -54,7 +64,7 @@ class ContestRepository private constructor(context: Context) {
         fileManager.deleteContestList()
     }
 
-    private fun processContestList(response: List<Contest>?, contestId: Int): Contest? {
+    fun processContestList(response: List<Contest>?, contestId: Int): Contest? {
         val contests = response ?: return null
         val contest = contests.firstOrNull { it.id == contestId }
         return contest

@@ -3,15 +3,16 @@ package com.example.cf_roulette.repository
 import android.content.Context
 import android.util.Log
 import com.example.cf_roulette.data.Problem
-import com.example.cf_roulette.data.ProblemsetResponse
 import com.example.cf_roulette.data.ProblemsetResult
 import com.example.cf_roulette.network.NetworkModule
 import com.example.cf_roulette.storage.FileManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.util.Calendar
+import java.util.TimeZone
 import kotlin.random.Random
 
-class ProblemRepository private constructor(context: Context) {
+class ProblemRepository private constructor(private val context: Context) {
 
     private val apiService = NetworkModule.codeforcesApi
     private val fileManager = FileManager(context)
@@ -57,15 +58,49 @@ class ProblemRepository private constructor(context: Context) {
         fileManager.deleteProblemset()
     }
 
-    private fun processProblemset(response: ProblemsetResult?, lowerBound: Int, upperBound: Int, seed: Long?): Problem? {
+    private suspend fun processProblemset(response: ProblemsetResult?, lowerBound: Int, upperBound: Int, seed: Long?): Problem? {
+
         val problems = response?.problems ?: return null
+        val contestRepository = ContestRepository.getInstance(context)
+        val contestList = contestRepository.getContestList()
+
         val filteredProblems = problems.filter { problem ->
-            when {
+            val passesRating = when {
                 lowerBound == 800 && upperBound == 3500 -> true
                 problem.rating == null -> false
                 else -> problem.rating in lowerBound..upperBound
             }
+            if (!passesRating) return@filter false
+
+            val contestId = problem.contestId ?: return@filter false
+            val contest = contestRepository.processContestList(contestList, contestId) ?: return@filter false
+
+            val contestMillis = (contest.startTimeSeconds + contest.durationSeconds) * 1000L
+            val contestCal = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply {
+                timeInMillis = contestMillis
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+
+            val nowCal = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply {
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+
+            val diffMillis = nowCal.timeInMillis - contestCal.timeInMillis
+            val daysSince = diffMillis / (1000 * 60 * 60 * 24)
+
+//            if (daysSince < 128){
+//                Log.d("ProblemFiltering", "Too young! " + problem.name + " " + contest.id + " " + daysSince.toString())
+//            }
+
+            return@filter daysSince >= 128
         }
+
         return getRandomProblem(filteredProblems, seed)
     }
 

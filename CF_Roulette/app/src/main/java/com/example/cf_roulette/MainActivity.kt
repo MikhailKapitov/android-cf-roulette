@@ -111,7 +111,6 @@ class MainActivity : AppCompatActivity() {
             }
 
             Log.d("TrashTest", "Updating contest cache...")
-            val updateSuccess =
             Log.d("TrashTest", "Cache update: " + contestRepository.updateCache().toString())
 
             Log.d("TrashTest", "Getting contest...")
