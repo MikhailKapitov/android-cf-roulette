@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
             Log.d("TrashTest", "Cache cleared: " + problemRepository.deleteCache().toString())
 
             Log.d("TrashTest", "Generating problem...")
-            var problem : Problem? = problemRepository.getProblem(800, 1200, listOf("implementation", "brute force"), tagOring = false, specialTagBanned = true)
+            var problem : Problem? = problemRepository.getProblem(800, 1200, 128, listOf("implementation", "brute force"), tagOring = false, specialTagBanned = true)
             if (problem != null) {
                 val problemName = problem.name
                 if (problemName != null) {
@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity() {
             Log.d("TrashTest", "Cache update: " + problemRepository.updateCache().toString())
 
             Log.d("TrashTest", "Generating problem...")
-            problem = problemRepository.getProblem(800, 1200, listOf("implementation", "brute force"), tagOring = false, specialTagBanned = true, 123)
+            problem = problemRepository.getProblem(800, 1200, 128, listOf("implementation", "brute force"), tagOring = false, specialTagBanned = true, 123)
             if (problem != null) {
                 val problemName = problem.name
                 if (problemName != null) {
@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             Log.d("TrashTest", "Generating problem...")
-            problem = problemRepository.getProblem(800, 1200, listOf("implementation", "brute force"), tagOring = false, specialTagBanned = true, 123)
+            problem = problemRepository.getProblem(800, 1200, 128, listOf("implementation", "brute force"), tagOring = false, specialTagBanned = true, 123)
             if (problem != null) {
                 val problemName = problem.name
                 if (problemName != null) {
@@ -87,7 +87,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             Log.d("TrashTest", "Generating problem...")
-            problem = problemRepository.getProblem(800, 1200, listOf("implementation", "brute force"), tagOring = false, specialTagBanned = true)
+            problem = problemRepository.getProblem(800, 1200, 128, listOf("implementation", "brute force"), tagOring = false, specialTagBanned = true)
             if (problem != null) {
                 val problemName = problem.name
                 if (problemName != null) {
@@ -121,6 +121,25 @@ class MainActivity : AppCompatActivity() {
                 Log.d("TrashTest", "Found contest: " + contest.name)
             } else {
                 Log.d("TrashTest", "No contest found .")
+            }
+
+            Log.d("TrashTest", "Hashing!")
+            var problemset = problemRepository.getProblemset(800, 3500, 0, listOf(), specialTagBanned = false, tagOring = false)
+            if (problemset == null){
+                Log.d("TrashTest", "No problemset...")
+            }
+            else{
+                Log.d("TrashTest", "Hash unfiltered: " + problemRepository.hashProblemList(problemset))
+                Log.d("TrashTest", "Len: " + problemset.size)
+            }
+            Log.d("TrashTest", "Hashing!")
+            problemset = problemRepository.getProblemset(800, 3500, 128, listOf(), specialTagBanned = false, tagOring = false)
+            if (problemset == null){
+                Log.d("TrashTest", "No problemset...")
+            }
+            else{
+                Log.d("TrashTest", "Hash filtered: " + problemRepository.hashProblemList(problemset))
+                Log.d("TrashTest", "Len: " + problemset.size)
             }
 
         }

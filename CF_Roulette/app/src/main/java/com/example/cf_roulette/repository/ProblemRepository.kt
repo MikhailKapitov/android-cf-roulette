@@ -6,6 +6,10 @@ import com.example.cf_roulette.data.Problem
 import com.example.cf_roulette.data.ProblemsetResult
 import com.example.cf_roulette.network.NetworkModule
 import com.example.cf_roulette.storage.FileManager
+import com.example.cf_roulette.util.HashingUtil.sha256
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.Calendar
@@ -16,6 +20,11 @@ class ProblemRepository private constructor(private val context: Context) {
 
     private val apiService = NetworkModule.codeforcesApi
     private val fileManager = FileManager(context)
+
+    private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+    private val adapter = moshi.adapter<List<Problem>>(
+        Types.newParameterizedType(List::class.java, Problem::class.java)
+    )
 
     companion object {
         private var INSTANCE: ProblemRepository? = null
@@ -28,14 +37,23 @@ class ProblemRepository private constructor(private val context: Context) {
         }
     }
 
-    suspend fun getProblem(lowerBound: Int, upperBound: Int, goodTags: List <String>, tagOring: Boolean, specialTagBanned: Boolean, randomSeed: Long? = null): Problem? {
+    suspend fun getProblemset(lowerBound: Int, upperBound: Int, dayCount: Int, goodTags: List <String>, tagOring: Boolean, specialTagBanned: Boolean): List <Problem>? {
         try {
             val cachedResponse = fileManager.loadProblemset()
-            return processProblemset(cachedResponse, lowerBound, upperBound, goodTags, tagOring, specialTagBanned, randomSeed)
+            val filteredProblems = processProblemset(cachedResponse, lowerBound, upperBound, dayCount, goodTags, tagOring, specialTagBanned)
+            return filteredProblems
         } catch (e: Exception) {
             Log.e("ProblemRepository", "Cache read error: ${e.message}")
             return null
         }
+    }
+
+    suspend fun getProblem(lowerBound: Int, upperBound: Int, dayCount: Int, goodTags: List <String>, tagOring: Boolean, specialTagBanned: Boolean, randomSeed: Long? = null): Problem? {
+        val filteredProblems = getProblemset(lowerBound, upperBound, dayCount, goodTags, tagOring, specialTagBanned)
+        if (filteredProblems == null){
+            return  null
+        }
+        return getRandomProblem(filteredProblems, randomSeed)
     }
 
     suspend fun updateCache(): Boolean = withContext(Dispatchers.IO) {
@@ -58,7 +76,7 @@ class ProblemRepository private constructor(private val context: Context) {
         fileManager.deleteProblemset()
     }
 
-    private suspend fun processProblemset(response: ProblemsetResult?, lowerBound: Int, upperBound: Int, goodTags: List <String>, tagOring: Boolean, specialTagBanned: Boolean, seed: Long?): Problem? {
+    private suspend fun processProblemset(response: ProblemsetResult?, lowerBound: Int, upperBound: Int, dayCount: Int, goodTags: List <String>, tagOring: Boolean, specialTagBanned: Boolean): List <Problem>? {
 
         val problems = response?.problems ?: return null
         val contestRepository = ContestRepository.getInstance(context)
@@ -94,7 +112,7 @@ class ProblemRepository private constructor(private val context: Context) {
             val diffMillis = nowCal.timeInMillis - contestCal.timeInMillis
             val daysSince = diffMillis / (1000 * 60 * 60 * 24)
 
-            if (daysSince < 128){
+            if (daysSince < dayCount){
                 Log.d("ProblemFiltering", "Too young! " + problem.name + " " + contest.id + " " + daysSince.toString())
                 return@filter false
             }
@@ -129,7 +147,7 @@ class ProblemRepository private constructor(private val context: Context) {
             return@filter true
         }
 
-        return getRandomProblem(filteredProblems, seed)
+        return filteredProblems
     }
 
     private fun getRandomProblem(problems: List<Problem>, seed: Long?): Problem? {
@@ -141,5 +159,11 @@ class ProblemRepository private constructor(private val context: Context) {
             return problems.random(random)
         }
         return problems.randomOrNull()
+    }
+
+    fun hashProblemList(problems: List<Problem>): String {
+        val sorted = problems.sortedWith(compareBy({ it.contestId }, { it.index }))
+        val json = adapter.toJson(sorted)
+        return sha256(json)
     }
 }
