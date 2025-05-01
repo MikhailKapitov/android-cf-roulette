@@ -166,4 +166,24 @@ class ProblemRepository private constructor(private val context: Context) {
         val json = adapter.toJson(sorted)
         return sha256(json)
     }
+
+    suspend fun getDailyProblems(): List <Problem?>{
+
+        val nowCal = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+
+        val randomSeed = nowCal.timeInMillis
+
+        return listOf(
+            getProblem(800, 1100, 128, listOf(), tagOring = false, specialTagBanned = true, randomSeed),
+            getProblem(1200, 1400, 128, listOf(), tagOring = false, specialTagBanned = true, randomSeed),
+            getProblem(1500, 1800, 128, listOf(), tagOring = false, specialTagBanned = true, randomSeed),
+            getProblem(1900, 2200, 128, listOf(), tagOring = false, specialTagBanned = true, randomSeed),
+            getProblem(2300, 3500, 128, listOf(), tagOring = false, specialTagBanned = true, randomSeed)
+            )
+    }
 }

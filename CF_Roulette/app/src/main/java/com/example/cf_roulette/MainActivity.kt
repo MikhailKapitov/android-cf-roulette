@@ -142,6 +142,13 @@ class MainActivity : AppCompatActivity() {
                 Log.d("TrashTest", "Len: " + problemset.size)
             }
 
+            Log.d("TrashTest", "Daily!")
+            val daily = problemRepository.getDailyProblems()
+
+            for (dailyProblem in daily){
+                Log.d("TrashTest", dailyProblem?.name ?: "IDK MAN")
+            }
+
         }
 
     }
