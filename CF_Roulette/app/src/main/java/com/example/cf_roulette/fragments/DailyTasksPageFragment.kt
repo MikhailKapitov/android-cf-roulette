@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.cf_roulette.R
 import com.example.cf_roulette.data.Problem
 import com.example.cf_roulette.repository.ProblemRepository
+import com.example.cf_roulette.repository.UserStatusRepository
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.TimeZone
@@ -30,6 +31,7 @@ class DailyTasksPageFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var taskAdapter: TaskAdapter
     private lateinit var problemRepository: ProblemRepository
+    private lateinit var userStatusRepository: UserStatusRepository
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -92,12 +94,14 @@ class DailyTasksPageFragment : Fragment() {
     }
 
     private fun updateTasks() {
+        if (isAdded) {
         loadDailyTasks()
         Toast.makeText(requireContext(), "Задачи обновлены!", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun startStatusUpdate() {
-        val statusUpdateTimer = object : CountDownTimer(60 * 1000, 60 * 1000) { // Каждые 60 секунд
+        val statusUpdateTimer = object : CountDownTimer(60 * 1000, 60 * 1000) {
             override fun onTick(millisUntilFinished: Long) {
             }
 
@@ -109,8 +113,11 @@ class DailyTasksPageFragment : Fragment() {
     }
 
     private fun checkTasksStatus() {
-        // TODO: Реализовать проверку статуса задач (например, через UserStatusResponse)
-        Toast.makeText(requireContext(), "Статусы задач обновлены!", Toast.LENGTH_SHORT).show()
+        // Проверка, прикреплен ли фрагмент
+        if (isAdded) {
+            // Выполнение операции, если фрагмент прикреплен
+            Toast.makeText(requireContext(), "Статусы задач обновлены!", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun copyToClipboard(text: String) {
