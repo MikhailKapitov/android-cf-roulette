@@ -46,11 +46,3 @@ data class Submission(
     @Json(name = "verdict") val verdict: String
     // Also "id", "contestId", "relativeTimeSeconds", "author", "programmingLanguage", "testset", "passedTestCount", "timeConsumedMillis", "memoryConsumedBytes", "points".
 )
-
-// temp realization
-data class Task(
-    val id: Int,
-    val name: String,
-    val status: Int,
-    val link: String?
-)
