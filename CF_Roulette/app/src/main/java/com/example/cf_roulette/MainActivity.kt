@@ -41,124 +41,131 @@ class MainActivity : AppCompatActivity() {
         bottomNavigationView.setupWithNavController(navController)
 
 
-        val problemRepository = ProblemRepository.getInstance(applicationContext)
-        val contestRepository = ContestRepository.getInstance(applicationContext)
-        val userStatusRepository = UserStatusRepository.getInstance(applicationContext)
-
-
+        
         // IK that this is terrible code. Just testing things.
-        lifecycleScope.launch {
 
-            Log.d("TrashTest", "Clearing cache...")
-            Log.d("TrashTest", "Cache cleared: " + problemRepository.deleteCache().toString())
+        val isDebugOn = false
 
-            Log.d("TrashTest", "Generating problem...")
-            var problem : Problem? = problemRepository.getProblem(800, 1200, 128, listOf("implementation", "brute force"), tagOring = false, specialTagBanned = true)
-            if (problem != null) {
-                val problemName = problem.name
-                if (problemName != null) {
-                    Log.d("TrashTest", problemName)
+        if (isDebugOn){
+
+            val problemRepository = ProblemRepository.getInstance(applicationContext)
+            val contestRepository = ContestRepository.getInstance(applicationContext)
+            val userStatusRepository = UserStatusRepository.getInstance(applicationContext)
+
+            lifecycleScope.launch {
+
+                Log.d("TrashTest", "Clearing cache...")
+                Log.d("TrashTest", "Cache cleared: " + problemRepository.deleteCache().toString())
+
+                Log.d("TrashTest", "Generating problem...")
+                var problem : Problem? = problemRepository.getProblem(800, 1200, 128, listOf("implementation", "brute force"), tagOring = false, specialTagBanned = true)
+                if (problem != null) {
+                    val problemName = problem.name
+                    if (problemName != null) {
+                        Log.d("TrashTest", problemName)
+                    } else {
+                        Log.d("TrashTest", "Problem found, no name though.")
+                    }
                 } else {
-                    Log.d("TrashTest", "Problem found, no name though.")
+                    Log.d("TrashTest", "No problem found (That is not a good thing LOL).")
                 }
-            } else {
-                Log.d("TrashTest", "No problem found (That is not a good thing LOL).")
-            }
 
-            Log.d("TrashTest", "Updating cache...")
-            Log.d("TrashTest", "Cache update: " + problemRepository.updateCache().toString())
+                Log.d("TrashTest", "Updating cache...")
+                Log.d("TrashTest", "Cache update: " + problemRepository.updateCache().toString())
 
-            Log.d("TrashTest", "Generating problem...")
-            problem = problemRepository.getProblem(800, 1200, 128, listOf("implementation", "brute force"), tagOring = false, specialTagBanned = true, 123)
-            if (problem != null) {
-                val problemName = problem.name
-                if (problemName != null) {
-                    Log.d("TrashTest", problemName)
+                Log.d("TrashTest", "Generating problem...")
+                problem = problemRepository.getProblem(800, 1200, 128, listOf("implementation", "brute force"), tagOring = false, specialTagBanned = true, 123)
+                if (problem != null) {
+                    val problemName = problem.name
+                    if (problemName != null) {
+                        Log.d("TrashTest", problemName)
+                    } else {
+                        Log.d("TrashTest", "Problem found, no name though.")
+                    }
                 } else {
-                    Log.d("TrashTest", "Problem found, no name though.")
+                    Log.d("TrashTest", "No problem found (That is not a good thing LOL).")
                 }
-            } else {
-                Log.d("TrashTest", "No problem found (That is not a good thing LOL).")
-            }
 
-            Log.d("TrashTest", "Generating problem...")
-            problem = problemRepository.getProblem(800, 1200, 128, listOf("implementation", "brute force"), tagOring = false, specialTagBanned = true, 123)
-            if (problem != null) {
-                val problemName = problem.name
-                if (problemName != null) {
-                    Log.d("TrashTest", problemName)
+                Log.d("TrashTest", "Generating problem...")
+                problem = problemRepository.getProblem(800, 1200, 128, listOf("implementation", "brute force"), tagOring = false, specialTagBanned = true, 123)
+                if (problem != null) {
+                    val problemName = problem.name
+                    if (problemName != null) {
+                        Log.d("TrashTest", problemName)
+                    } else {
+                        Log.d("TrashTest", "Problem found, no name though.")
+                    }
                 } else {
-                    Log.d("TrashTest", "Problem found, no name though.")
+                    Log.d("TrashTest", "No problem found (That is not a good thing LOL).")
                 }
-            } else {
-                Log.d("TrashTest", "No problem found (That is not a good thing LOL).")
-            }
 
-            Log.d("TrashTest", "Generating problem...")
-            problem = problemRepository.getProblem(800, 1200, 128, listOf("implementation", "brute force"), tagOring = false, specialTagBanned = true)
-            if (problem != null) {
-                val problemName = problem.name
-                if (problemName != null) {
-                    Log.d("TrashTest", problemName)
+                Log.d("TrashTest", "Generating problem...")
+                problem = problemRepository.getProblem(800, 1200, 128, listOf("implementation", "brute force"), tagOring = false, specialTagBanned = true)
+                if (problem != null) {
+                    val problemName = problem.name
+                    if (problemName != null) {
+                        Log.d("TrashTest", problemName)
+                    } else {
+                        Log.d("TrashTest", "Problem found, no name though.")
+                    }
                 } else {
-                    Log.d("TrashTest", "Problem found, no name though.")
+                    Log.d("TrashTest", "No problem found (That is not a good thing LOL).")
                 }
-            } else {
-                Log.d("TrashTest", "No problem found (That is not a good thing LOL).")
-            }
 
 
 
-            Log.d("TrashTest", "Clearing contest cache...")
-            Log.d("TrashTest", "Cache cleared: " + contestRepository.deleteCache().toString())
+                Log.d("TrashTest", "Clearing contest cache...")
+                Log.d("TrashTest", "Cache cleared: " + contestRepository.deleteCache().toString())
 
-            Log.d("TrashTest", "Getting contest...")
-            var contest: Contest? = contestRepository.getContest(123)
-            if (contest != null) {
-                Log.d("TrashTest", "Found contest: " + contest.name)
-            } else {
-                Log.d("TrashTest", "No contest found.")
-            }
+                Log.d("TrashTest", "Getting contest...")
+                var contest: Contest? = contestRepository.getContest(123)
+                if (contest != null) {
+                    Log.d("TrashTest", "Found contest: " + contest.name)
+                } else {
+                    Log.d("TrashTest", "No contest found.")
+                }
 
-            Log.d("TrashTest", "Updating contest cache...")
-            Log.d("TrashTest", "Cache update: " + contestRepository.updateCache().toString())
+                Log.d("TrashTest", "Updating contest cache...")
+                Log.d("TrashTest", "Cache update: " + contestRepository.updateCache().toString())
 
-            Log.d("TrashTest", "Getting contest...")
-            contest = contestRepository.getContest(123)
-            if (contest != null) {
-                Log.d("TrashTest", "Found contest: " + contest.name)
-            } else {
-                Log.d("TrashTest", "No contest found .")
-            }
-
-
-
-            Log.d("TrashTest", "Hashing!")
-            var problemset = problemRepository.getProblemset(800, 3500, 0, listOf(), specialTagBanned = false, tagOring = false)
-            if (problemset == null){
-                Log.d("TrashTest", "No problemset...")
-            }
-            else{
-                Log.d("TrashTest", "Hash unfiltered: " + problemRepository.hashProblemList(problemset))
-                Log.d("TrashTest", "Len: " + problemset.size)
-            }
-            Log.d("TrashTest", "Hashing!")
-            problemset = problemRepository.getProblemset(800, 3500, 128, listOf(), specialTagBanned = false, tagOring = false)
-            if (problemset == null){
-                Log.d("TrashTest", "No problemset...")
-            }
-            else{
-                Log.d("TrashTest", "Hash filtered: " + problemRepository.hashProblemList(problemset))
-                Log.d("TrashTest", "Len: " + problemset.size)
-            }
+                Log.d("TrashTest", "Getting contest...")
+                contest = contestRepository.getContest(123)
+                if (contest != null) {
+                    Log.d("TrashTest", "Found contest: " + contest.name)
+                } else {
+                    Log.d("TrashTest", "No contest found .")
+                }
 
 
 
-            Log.d("TrashTest", "Daily!")
-            val daily = problemRepository.getDailyProblems()
+                Log.d("TrashTest", "Hashing!")
+                var problemset = problemRepository.getProblemset(800, 3500, 0, listOf(), specialTagBanned = false, tagOring = false)
+                if (problemset == null){
+                    Log.d("TrashTest", "No problemset...")
+                }
+                else{
+                    Log.d("TrashTest", "Hash unfiltered: " + problemRepository.hashProblemList(problemset))
+                    Log.d("TrashTest", "Len: " + problemset.size)
+                }
+                Log.d("TrashTest", "Hashing!")
+                problemset = problemRepository.getProblemset(800, 3500, 128, listOf(), specialTagBanned = false, tagOring = false)
+                if (problemset == null){
+                    Log.d("TrashTest", "No problemset...")
+                }
+                else{
+                    Log.d("TrashTest", "Hash filtered: " + problemRepository.hashProblemList(problemset))
+                    Log.d("TrashTest", "Len: " + problemset.size)
+                }
 
-            for (dailyProblem in daily){
-                Log.d("TrashTest", dailyProblem?.name ?: "IDK MAN")
+
+
+                Log.d("TrashTest", "Daily!")
+                val daily = problemRepository.getDailyProblems()
+
+                for (dailyProblem in daily){
+                    Log.d("TrashTest", dailyProblem?.name ?: "IDK MAN")
+                }
+
             }
 
         }
