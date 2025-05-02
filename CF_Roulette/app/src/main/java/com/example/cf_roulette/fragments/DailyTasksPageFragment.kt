@@ -11,6 +11,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -36,6 +37,7 @@ class DailyTasksPageFragment : Fragment() {
     private lateinit var userStatusRepository: UserStatusRepository
     private lateinit var sharedPref: SharedPreferences
     private lateinit var validProblems:List<Problem>
+    private lateinit var btnUpdateStatus: Button
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,6 +46,7 @@ class DailyTasksPageFragment : Fragment() {
         val view = inflater.inflate(R.layout.daily_tasks_page_fragment, container, false)
         timerTextView = view.findViewById(R.id.timer_text)
         recyclerView = view.findViewById(R.id.item_list)
+        btnUpdateStatus = view.findViewById(R.id.btn_update_status)
         sharedPref=requireActivity().getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         problemRepository = ProblemRepository.getInstance(requireContext())
         userStatusRepository = UserStatusRepository.getInstance(requireContext())
@@ -57,7 +60,9 @@ class DailyTasksPageFragment : Fragment() {
         startDailyTaskUpdate()
 
         startStatusUpdate()
-
+        btnUpdateStatus.setOnClickListener {
+            checkTasksStatus()
+        }
         return view
     }
 
