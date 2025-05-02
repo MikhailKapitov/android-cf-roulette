@@ -3,6 +3,7 @@ package com.example.cf_roulette.fragments
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -32,6 +33,8 @@ class DailyTasksPageFragment : Fragment() {
     private lateinit var taskAdapter: TaskAdapter
     private lateinit var problemRepository: ProblemRepository
     private lateinit var userStatusRepository: UserStatusRepository
+    private lateinit var sharedPref: SharedPreferences
+    private lateinit var validProblems:List<Problem>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,7 +43,7 @@ class DailyTasksPageFragment : Fragment() {
         val view = inflater.inflate(R.layout.daily_tasks_page_fragment, container, false)
         timerTextView = view.findViewById(R.id.timer_text)
         recyclerView = view.findViewById(R.id.item_list)
-
+        sharedPref=requireActivity().getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         problemRepository = ProblemRepository.getInstance(requireContext())
 
         setupRecyclerView(emptyList())
@@ -70,7 +73,7 @@ class DailyTasksPageFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val problems = problemRepository.getDailyProblems()
-                val validProblems = problems.filterNotNull()
+                validProblems = problems.filterNotNull()
                 taskAdapter.updateProblems(validProblems)
                 if (validProblems.isEmpty()) {
                     Toast.makeText(requireContext(), "Не удалось загрузить задачи", Toast.LENGTH_SHORT).show()
@@ -113,10 +116,16 @@ class DailyTasksPageFragment : Fragment() {
     }
 
     private fun checkTasksStatus() {
-        // Проверка, прикреплен ли фрагмент
         if (isAdded) {
             // Выполнение операции, если фрагмент прикреплен
+            var username=sharedPref.getString("cf_nickname", "")
+            if (username.isNullOrEmpty()){
+                username=" "
+            }
+            viewLifecycleOwner.lifecycleScope.launch {
+            val statuses =userStatusRepository.checkStatus(username,validProblems)
             Toast.makeText(requireContext(), "Статусы задач обновлены!", Toast.LENGTH_SHORT).show()
+                }
         }
     }
 
