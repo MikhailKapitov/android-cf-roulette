@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -70,7 +71,7 @@ class DailyTasksPageFragment : Fragment() {
         taskAdapter = TaskAdapter(problems) { problem ->
             val url = "https://codeforces.com/problemset/problem/${problem.contestId}/${problem.index}"
             copyToClipboard(url)
-            Toast.makeText(requireContext(), "Ссылка скопирована!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Copied to clipboard!", Toast.LENGTH_SHORT).show()
         }
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = taskAdapter
@@ -84,10 +85,10 @@ class DailyTasksPageFragment : Fragment() {
                 taskAdapter.updateProblems(validProblems)
                 checkTasksStatus()
                 if (validProblems.isEmpty()) {
-                    Toast.makeText(requireContext(), "Не удалось загрузить задачи", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Failed to load tasks", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Ошибка загрузки задач: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), "Error loading tasks: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -107,7 +108,7 @@ class DailyTasksPageFragment : Fragment() {
     private fun updateTasks() {
         if (isAdded) {
         loadDailyTasks()
-        Toast.makeText(requireContext(), "Задачи обновлены!", Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), "Tasks have been updated!", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -134,11 +135,11 @@ class DailyTasksPageFragment : Fragment() {
                 val statuses = userStatusRepository.checkStatus(username, validProblems)
                 Log.d("StatusInfo", statuses.toString())
                 taskAdapter.updateStatuses(statuses)
-                Toast.makeText(requireContext(), "Статусы задач обновлены!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Task statuses have been updated!", Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
-                Log.d("StatusInfo", "Не удалось получить статусы: ${e.message}")
+                Log.d("StatusInfo", "Failed to get statuses: ${e.message}")
                 Toast.makeText(requireContext(),
-                    "Не удалось получить статусы: ${e.message}", Toast.LENGTH_LONG).show()
+                    "Failed to get statuses: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -220,7 +221,16 @@ class TaskAdapter(
         }
 
         holder.taskStatus.text = label
+
         holder.taskStatus.setTextColor(color)
+        holder.itemView.setOnClickListener {
+            onItemClick(problem)
+        }
+
+        holder.itemView.setOnLongClickListener {
+            showPopupMenu(it.context, it, problem)
+            true
+        }
 
         holder.itemView.setOnClickListener { onItemClick(problem) }
     }
@@ -235,4 +245,30 @@ class TaskAdapter(
         statuses = List(newProblems.size) { 3 }
         notifyDataSetChanged()
     }
+    private fun showPopupMenu(context: Context, anchor: View, problem: Problem) {
+        val popup = PopupMenu(context, anchor)
+        popup.menuInflater.inflate(R.menu.problem_popup_menu, popup.menu)
+
+        popup.setOnMenuItemClickListener { item ->
+            val url = "https://codeforces.com/problemset/problem/${problem.contestId}/${problem.index}"
+            when (item.itemId) {
+                R.id.menu_copy -> {
+                    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    val clip = ClipData.newPlainText("Task Link", url)
+                    clipboard.setPrimaryClip(clip)
+                    Toast.makeText(context, "Copied to clipboard!", Toast.LENGTH_SHORT).show()
+                }
+                R.id.menu_open -> {
+                    val intent = android.content.Intent(android.content.Intent.ACTION_VIEW).apply {
+                        data = android.net.Uri.parse(url)
+                    }
+                    context.startActivity(intent)
+                }
+            }
+            true
+        }
+
+        popup.show()
+    }
+
 }

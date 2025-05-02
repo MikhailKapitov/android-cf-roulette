@@ -50,7 +50,7 @@ class TaskGeneratorPageFragment : Fragment() {
         clearTagsButton.setOnClickListener {
             selectedTags.clear()
             updateTagsTitle(tagsTitle)
-            Toast.makeText(requireContext(), "Теги очищены", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Tags cleared", Toast.LENGTH_SHORT).show()
         }
 
         specialProblemButton.setOnClickListener {
@@ -78,14 +78,14 @@ class TaskGeneratorPageFragment : Fragment() {
         val tagAdapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_dropdown_item,
-            listOf("Выбери тег") + codeforcesTags
+            listOf("Select a tag") + codeforcesTags
         )
         tagSelector.adapter = tagAdapter
 
         tagSelector.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, viewItem: View?, position: Int, id: Long) {
                 val selected = parent.getItemAtPosition(position).toString()
-                if (selected != "Выбери тег" && selectedTags.add(selected)) {
+                if (selected != "Select a tag" && selectedTags.add(selected)) {
                     updateTagsTitle(tagsTitle)
                 }
             }
@@ -118,15 +118,36 @@ class TaskGeneratorPageFragment : Fragment() {
                         taskCard.findViewById<TextView>(R.id.task_name).text = problem.name
                         taskCard.findViewById<TextView>(R.id.task_status).visibility = View.GONE
 
-                        taskCard.setOnClickListener {
+                        taskCard.setOnClickListener { view ->
+                            val popup = PopupMenu(requireContext(), view)
+                            popup.menuInflater.inflate(R.menu.problem_popup_menu, popup.menu)
+
                             val link = "https://codeforces.com/problemset/problem/${problem.contestId}/${problem.index}"
-                            copyToClipboard(link)
-                            Toast.makeText(requireContext(), "Ссылка скопирована!", Toast.LENGTH_SHORT).show()
+
+                            popup.setOnMenuItemClickListener { item ->
+                                when (item.itemId) {
+                                    R.id.menu_copy -> {
+                                        copyToClipboard(link)
+                                        Toast.makeText(requireContext(), "Copied to clipboard!", Toast.LENGTH_SHORT).show()
+                                        true
+                                    }
+                                    R.id.menu_open -> {
+                                        val intent = android.content.Intent(android.content.Intent.ACTION_VIEW)
+                                        intent.data = android.net.Uri.parse(link)
+                                        startActivity(intent)
+                                        true
+                                    }
+                                    else -> false
+                                }
+                            }
+
+                            popup.show()
                         }
+
 
                         placeholder.addView(taskCard)
                     } else {
-                        Toast.makeText(requireContext(), "Не удалось найти задачу", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "Could not find task", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
