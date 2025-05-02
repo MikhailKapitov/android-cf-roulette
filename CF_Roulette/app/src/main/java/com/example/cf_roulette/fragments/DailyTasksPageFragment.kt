@@ -7,6 +7,7 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -45,6 +46,7 @@ class DailyTasksPageFragment : Fragment() {
         recyclerView = view.findViewById(R.id.item_list)
         sharedPref=requireActivity().getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         problemRepository = ProblemRepository.getInstance(requireContext())
+        userStatusRepository = UserStatusRepository.getInstance(requireContext())
 
         setupRecyclerView(emptyList())
 
@@ -75,6 +77,7 @@ class DailyTasksPageFragment : Fragment() {
                 val problems = problemRepository.getDailyProblems()
                 validProblems = problems.filterNotNull()
                 taskAdapter.updateProblems(validProblems)
+                checkTasksStatus()
                 if (validProblems.isEmpty()) {
                     Toast.makeText(requireContext(), "Не удалось загрузить задачи", Toast.LENGTH_SHORT).show()
                 }
@@ -116,16 +119,22 @@ class DailyTasksPageFragment : Fragment() {
     }
 
     private fun checkTasksStatus() {
-        if (isAdded) {
-            // Выполнение операции, если фрагмент прикреплен
-            var username=sharedPref.getString("cf_nickname", "")
-            if (username.isNullOrEmpty()){
-                username=" "
+        if (!isAdded) return
+
+        var username = sharedPref.getString("cf_nickname", "").orEmpty()
+        if (username.isBlank()) username = " "
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val statuses = userStatusRepository.checkStatus(username, validProblems)
+                Log.d("StatusInfo", statuses.toString())
+                taskAdapter.updateStatuses(statuses)
+                Toast.makeText(requireContext(), "Статусы задач обновлены!", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Log.d("StatusInfo", "Не удалось получить статусы: ${e.message}")
+                Toast.makeText(requireContext(),
+                    "Не удалось получить статусы: ${e.message}", Toast.LENGTH_LONG).show()
             }
-            viewLifecycleOwner.lifecycleScope.launch {
-            val statuses =userStatusRepository.checkStatus(username,validProblems)
-            Toast.makeText(requireContext(), "Статусы задач обновлены!", Toast.LENGTH_SHORT).show()
-                }
         }
     }
 
@@ -175,10 +184,12 @@ class TaskAdapter(
     private val onItemClick: (Problem) -> Unit
 ) : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
 
+    private var statuses: List<Int> = emptyList()
+
     class TaskViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val taskId: TextView = view.findViewById(R.id.task_id)
+        val taskId: TextView    = view.findViewById(R.id.task_id)
         val taskTitle: TextView = view.findViewById(R.id.task_name)
-        val taskStatus: TextView = view.findViewById(R.id.task_status)
+        val taskStatus: TextView= view.findViewById(R.id.task_status)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
@@ -187,21 +198,36 @@ class TaskAdapter(
         return TaskViewHolder(view)
     }
 
+    override fun getItemCount() = problems.size
+
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
         val problem = problems[position]
 
-        holder.taskId.text = "ID: ${problem.contestId ?: "N/A"}${problem.index ?: ""}"
+        holder.taskId.text    = "ID: ${problem.contestId ?: "N/A"}${problem.index ?: ""}"
         holder.taskTitle.text = problem.name ?: "No title"
-        holder.taskStatus.text = "Status: Pending"
-        holder.taskStatus.setTextColor(Color.GRAY)
+
+        val code = statuses.getOrNull(position) ?: 3
+        val (label, color) = when (code) {
+            0 -> "Unattempted" to Color.GRAY
+            1 -> "Solved"      to Color.GREEN
+            2 -> "Failed"      to Color.RED
+            else -> "Unknown"  to Color.DKGRAY
+        }
+
+        holder.taskStatus.text = label
+        holder.taskStatus.setTextColor(color)
 
         holder.itemView.setOnClickListener { onItemClick(problem) }
     }
 
-    override fun getItemCount() = problems.size
+    fun updateStatuses(newStatuses: List<Int>) {
+        statuses = newStatuses
+        notifyDataSetChanged()
+    }
 
     fun updateProblems(newProblems: List<Problem>) {
         problems = newProblems
+        statuses = List(newProblems.size) { 3 }
         notifyDataSetChanged()
     }
 }
