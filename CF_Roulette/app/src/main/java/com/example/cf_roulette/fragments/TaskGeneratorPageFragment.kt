@@ -19,10 +19,14 @@ import kotlinx.coroutines.withContext
 class TaskGeneratorPageFragment : Fragment() {
     private lateinit var problemRepository: ProblemRepository
     private val codeforcesTags = listOf(
-        "implementation", "dp", "math", "greedy", "brute force",
-        "data structures", "constructive algorithms", "graphs",
-        "sortings", "binary search", "dfs and similar", "trees",
-        "strings", "number theory", "combinatorics", "bitmasks"
+        "*special", "2-sat", "binary search", "bitmasks", "brute force",
+        "chinese remainder theorem", "combinatorics", "constructive algorithms",
+        "data structures", "dfs and similar", "divide and conquer", "dp", "dsu",
+        "expression parsing", "fft", "flows", "games", "geometry", "graph matchings",
+        "graphs", "greedy", "hashing", "implementation", "interactive", "math",
+        "matrices", "meet-in-the-middle", "number theory", "probabilities",
+        "schedules", "shortest paths", "sortings", "string suffix structures",
+        "strings", "ternary search", "trees", "two pointers"
     )
     private var specialTagBanned = true
     private var tagOring = true
